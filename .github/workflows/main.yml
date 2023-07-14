@@ -23,7 +23,7 @@ jobs:
             any::tidyr
             any::downloader
             any::lubridate
-            any::rio
+            any::data.table
             
       - name: Execute Script
         run: |
