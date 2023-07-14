@@ -1,6 +1,6 @@
 library(dplyr)
 library(tidyr)
-library(rio)
+library(data.table)
 library(downloader)
 library(lubridate)
 
@@ -30,9 +30,18 @@ for(i in seq_along(datas)) {
   })
 }
 
-empenho <- import_list(dir(pattern = ".*Despesas_Empenho\\.csv$"), encoding = "Latin-1", rbind = TRUE)
-liquidacao <- import_list(dir(pattern = ".*Despesas_Liquidacao\\.csv$"), encoding = "Latin-1", rbind = TRUE)
-pagamento <- import_list(dir(pattern = ".*Despesas_Pagamento\\.csv$"), encoding = "Latin-1", rbind = TRUE)
+
+# Listar os arquivos CSV na pasta
+empenho <- list.files(pattern = ".*Despesas_Empenho\\.csv$", full.names = TRUE) 
+liquidacao <- list.files(pattern = ".*Despesas_Liquidacao\\.csv$", full.names = TRUE) 
+pagamento <- list.files(pattern = ".*Despesas_Pagamento\\.csv$", full.names = TRUE) 
+
+
+#Importar e juntar
+empenho <- do.call(rbind, lapply(empenho, function(file) fread(file, encoding = "Latin-1")))
+liquidacao <- do.call(rbind, lapply(liquidacao, function(file) fread(file, encoding = "Latin-1")))
+pagamento <- do.call(rbind, lapply(pagamento, function(file) fread(file, encoding = "Latin-1")))
+
 
 empenho <- empenho |> 
   select(6,3,62,4,7,11:14,17:19, 31,33,35,37,42,47,49,53:55) 
@@ -52,16 +61,22 @@ colnames(pagamento) <- c("tipo_documento", "cod_pagamento", "valor", "data", "ti
 empenho <- empenho |> 
   filter(cod_orgao == '26423') |> 
   mutate(valor = as.numeric(str_replace(valor, ",", "."))) |> 
-  mutate(data=dmy(data))
+  mutate(data=dmy(data)) |> 
+  arrange(desc(data), desc(cod_empenho))
   
+
 liquidacao <- liquidacao |>
   filter(cod_orgao == '26423') |> 
-  mutate(data=dmy(data))
+  mutate(data=dmy(data)) |> 
+  arrange(desc(data), desc(cod_liquidacao))
+
   
 pagamento <- pagamento |> 
   filter(cod_orgao == '26423') |> 
   mutate(valor = as.numeric(str_replace(valor, ",", "."))) |> 
-  mutate(data=dmy(data))
+  mutate(data=dmy(data)) |> 
+  arrange(desc(data), desc(cod_pagamento))
+
 
 arquivos_csv <- dir(pattern = ".csv")
 file.remove(arquivos_csv)
@@ -69,3 +84,7 @@ file.remove(arquivos_csv)
 saveRDS(empenho, 'dados/empenho.rds')
 saveRDS(liquidacao, 'dados/liquidacao.rds')
 saveRDS(pagamento, 'dados/pagamento.rds')
+
+
+despesas_IFS <- readRDS(url('https://github.com/Rodslater/transparencia/raw/main/data/despesas_IFS.rds')) 
+despesas_IFS_2021_2022 <- readRDS(url('https://github.com/Rodslater/transparencia/raw/main/data/despesas_IFS_2021_2022.rds')) 
