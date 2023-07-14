@@ -21,6 +21,7 @@ jobs:
           packages: |
             any::dplyr
             any::tidyr
+            any::stringr
             any::downloader
             any::lubridate
             any::data.table
