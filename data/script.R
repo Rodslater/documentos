@@ -8,19 +8,25 @@ library(lubridate)
 datas <- c()
 ano_corrente <- year(Sys.Date())
 
-for (mes in 1:12) {
-  ultimo_dia <- days_in_month(ymd(paste(ano_corrente, mes, 1, sep = "-")))
-  for (dia in 1:ultimo_dia) {
-    data <- ymd(paste(ano_corrente, mes, dia, sep = "-"))
-    if (data > Sys.Date()) {
-      break  # Interrompe o loop se a data for posterior ao dia corrente
-    }
-    numero <- as.numeric(format(data, "%Y%m%d"))
-    datas <- c(datas, numero)
-  }
+# Crie um vetor vazio para armazenar as datas
+datas <- c()
+
+# Defina a data inicial como o primeiro dia do ano há dois anos atrás
+data_inicial <- ymd(paste(year(Sys.Date()) - 2, "01-01", sep = "-"))
+
+# Obtenha a data atual
+data_atual <- Sys.Date()
+
+# Loop para baixar as datas desde o primeiro dia do ano há dois anos atrás até a data atual
+data <- data_inicial
+while (data <= data_atual) {
+  numero <- as.numeric(format(data, "%Y%m%d"))
+  datas <- c(datas, numero)
+  data <- data + days(1)  # Avança para o próximo dia
 }
 
 
+#Loop de baixar as séries
 for(i in seq_along(datas)) {
   try({url <- paste0('https://portaldatransparencia.gov.br/download-de-dados/despesas/', datas[i]) #Try passa pra o próximo em caso de erro.
   arquivo <- sprintf("dataset_%s.zip", datas[i])
