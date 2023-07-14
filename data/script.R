@@ -56,7 +56,6 @@ empenho <- empenho |>
   
 liquidacao <- liquidacao |>
   filter(cod_orgao == '26423') |> 
-  mutate(valor = as.numeric(str_replace(valor, ",", "."))) |> 
   mutate(data=dmy(data))
   
 pagamento <- pagamento |> 
