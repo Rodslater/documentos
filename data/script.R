@@ -6,17 +6,20 @@ library(downloader)
 library(lubridate)
 
 datas <- c()
-
 ano_corrente <- year(Sys.Date())
 
 for (mes in 1:12) {
   ultimo_dia <- days_in_month(ymd(paste(ano_corrente, mes, 1, sep = "-")))
   for (dia in 1:ultimo_dia) {
     data <- ymd(paste(ano_corrente, mes, dia, sep = "-"))
+    if (data > Sys.Date()) {
+      break  # Interrompe o loop se a data for posterior ao dia corrente
+    }
     numero <- as.numeric(format(data, "%Y%m%d"))
     datas <- c(datas, numero)
   }
 }
+
 
 for(i in seq_along(datas)) {
   try({url <- paste0('https://portaldatransparencia.gov.br/download-de-dados/despesas/', datas[i]) #Try passa pra o próximo em caso de erro.
@@ -38,10 +41,9 @@ liquidacao <- list.files(pattern = ".*Despesas_Liquidacao\\.csv$", full.names = 
 pagamento <- list.files(pattern = ".*Despesas_Pagamento\\.csv$", full.names = TRUE) 
 
 
-#Importar e juntar
-empenho <- do.call(rbind, lapply(empenho, function(file) fread(file, encoding = "Latin-1")))
-liquidacao <- do.call(rbind, lapply(liquidacao, function(file) fread(file, encoding = "Latin-1")))
-pagamento <- do.call(rbind, lapply(pagamento, function(file) fread(file, encoding = "Latin-1")))
+empenho <- rbindlist(lapply(empenho, function(file) fread(file, encoding = "Latin-1", colClasses = "character")))
+liquidacao <- rbindlist(lapply(liquidacao, function(file) fread(file, encoding = "Latin-1", colClasses = "character")))
+pagamento <- rbindlist(lapply(pagamento, function(file) fread(file, encoding = "Latin-1", colClasses = "character")))
 
 
 empenho <- empenho |> 
