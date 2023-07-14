@@ -84,7 +84,3 @@ file.remove(arquivos_csv)
 saveRDS(empenho, 'dados/empenho.rds')
 saveRDS(liquidacao, 'dados/liquidacao.rds')
 saveRDS(pagamento, 'dados/pagamento.rds')
-
-
-despesas_IFS <- readRDS(url('https://github.com/Rodslater/transparencia/raw/main/data/despesas_IFS.rds')) 
-despesas_IFS_2021_2022 <- readRDS(url('https://github.com/Rodslater/transparencia/raw/main/data/despesas_IFS_2021_2022.rds')) 
