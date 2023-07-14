@@ -84,6 +84,6 @@ pagamento <- pagamento |>
 arquivos_csv <- dir(pattern = ".csv")
 file.remove(arquivos_csv)
 
-saveRDS(empenho, 'dados/empenho.rds')
-saveRDS(liquidacao, 'dados/liquidacao.rds')
-saveRDS(pagamento, 'dados/pagamento.rds')
+saveRDS(empenho, 'data/empenho.rds')
+saveRDS(liquidacao, 'data/liquidacao.rds')
+saveRDS(pagamento, 'data/pagamento.rds')
