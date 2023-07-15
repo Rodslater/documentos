@@ -17,7 +17,7 @@ data_inicial <- ymd(paste(year(Sys.Date()) - 1, "01-01", sep = "-"))
 # Obtenha a data atual
 data_atual <- Sys.Date()
 
-# Loop para baixar as datas desde o primeiro dia do ano há 1 ano atrás até a data atual
+# Loop de gerar as datas desde o primeiro dia do ano há 1 ano atrás até a data atual
 data <- data_inicial
 while (data <= data_atual) {
   numero <- as.numeric(format(data, "%Y%m%d"))
@@ -30,6 +30,22 @@ while (data <= data_atual) {
 for (i in seq_along(datas)) {
   url <- paste0('https://portaldatransparencia.gov.br/download-de-dados/despesas/', datas[i])
   arquivo <- sprintf("dataset_%s.zip", datas[i])
+  
+  # Verifica se o arquivo existe antes de fazer o download
+  response <- tryCatch(
+    {
+      httr::GET(url)
+    },
+    error = function(e) {
+      return(NULL)
+    }
+  )
+  
+  # Se a resposta é NULL, o arquivo não existe, então passa para a próxima iteração
+  if (is.null(response)) {
+    message(paste("Arquivo não encontrado:", arquivo))
+    next
+  }
   
   tryCatch(
     {
