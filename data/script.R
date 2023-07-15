@@ -28,7 +28,6 @@ while (data <= data_atual) {
 
 
 #Loop de baixar as séries
-
 for (i in seq_along(datas)) {
   url <- paste0('https://portaldatransparencia.gov.br/download-de-dados/despesas/', datas[i], '.zip')
   arquivo <- sprintf("dataset_%s.zip", datas[i])
@@ -46,7 +45,7 @@ for (i in seq_along(datas)) {
   # Se a resposta é NULL, o arquivo não existe, então passa para a próxima iteração
   if (is.null(response)) {
     message(paste("Arquivo não encontrado:", arquivo))
-    next
+    return()
   }
   
   tryCatch(
@@ -61,11 +60,10 @@ for (i in seq_along(datas)) {
     },
     error = function(e) {
       message(paste("Erro ao baixar o arquivo:", arquivo))
-      next
+      return()
     }
   )
 }
-
 
 
 # Listar os arquivos CSV na pasta
