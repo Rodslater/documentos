@@ -6,6 +6,8 @@ library(downloader)
 library(lubridate)
 library(httr)
 
+memory.limit(24576)
+
 datas <- c()
 ano_corrente <- year(Sys.Date())
 
