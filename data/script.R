@@ -27,17 +27,25 @@ while (data <= data_atual) {
 
 
 #Loop de baixar as séries
-for(i in seq_along(datas)) {
-  try({url <- paste0('https://portaldatransparencia.gov.br/download-de-dados/despesas/', datas[i]) #Try passa pra o próximo em caso de erro.
+for (i in seq_along(datas)) {
+  url <- paste0('https://portaldatransparencia.gov.br/download-de-dados/despesas/', datas[i])
   arquivo <- sprintf("dataset_%s.zip", datas[i])
-  download(url, dest=arquivo, mode="wb") 
-  unzip (arquivo)
-  file.remove(arquivo) #remover arquivo baixado
-  arquivos_csv <- list.files(pattern = "\\.csv$", full.names = TRUE) # Listar todos os arquivos CSV na pasta
-  padroes_mantidos <- c(".*Despesas_Empenho\\.csv$", ".*Despesas_Liquidacao\\.csv$", ".*Despesas_Pagamento\\.csv$") # Definir padrões de nomes de arquivos a serem mantidos
-  arquivos_remover <- arquivos_csv[!grepl(paste(padroes_mantidos, collapse = "|"), arquivos_csv)] # Filtrar os arquivos CSV a serem removidos
-  file.remove(arquivos_remover) # Remover os arquivos
-  })
+  
+  tryCatch(
+    {
+      download(url, dest = arquivo, mode = "wb")
+      unzip(arquivo)
+      file.remove(arquivo)
+      arquivos_csv <- list.files(pattern = "\\.csv$", full.names = TRUE)
+      padroes_mantidos <- c(".*Despesas_Empenho\\.csv$", ".*Despesas_Liquidacao\\.csv$", ".*Despesas_Pagamento\\.csv$")
+      arquivos_remover <- arquivos_csv[!grepl(paste(padroes_mantidos, collapse = "|"), arquivos_csv)]
+      file.remove(arquivos_remover)
+    },
+    error = function(e) {
+      message(paste("Erro ao baixar o arquivo:", arquivo))
+      next
+    }
+  )
 }
 
 
