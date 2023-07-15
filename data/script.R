@@ -4,6 +4,7 @@ library(stringr)
 library(data.table)
 library(downloader)
 library(lubridate)
+library(httr)
 
 datas <- c()
 ano_corrente <- year(Sys.Date())
@@ -27,7 +28,6 @@ while (data <= data_atual) {
 
 
 #Loop de baixar as séries
-library(httr)
 
 for (i in seq_along(datas)) {
   url <- paste0('https://portaldatransparencia.gov.br/download-de-dados/despesas/', datas[i], '.zip')
