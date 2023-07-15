@@ -25,6 +25,7 @@ jobs:
             any::downloader
             any::lubridate
             any::data.table
+            any::httr
             
       - name: Execute Script
         run: |
