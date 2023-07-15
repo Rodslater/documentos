@@ -78,10 +78,10 @@ pagamento <- rbindlist(lapply(pagamento, function(file) fread(file, encoding = "
 
                               
 empenho <- empenho |> 
-  select(6,3,62,4,7,11:14,17:19, 31,33,35,37,42,47,49,53,55,54) 
+  select(6,3,62,4,7,11:14,17:19,31,33,35,37,42,47,49,53,55,54) 
 
 liquidacao <- liquidacao |> 
-  select(5,2,3,8,10,11, 14:16,18,20,24,26)
+  select(5,2,3,8,10,11,14:16,18,20,24,26)
 
 pagamento <- pagamento |> 
   select(5,2,33,3,6,10,12,13,16:19,21,23,27,29)
