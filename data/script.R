@@ -11,13 +11,13 @@ ano_corrente <- year(Sys.Date())
 # Crie um vetor vazio para armazenar as datas
 datas <- c()
 
-# Defina a data inicial como o primeiro dia do ano há dois anos atrás
-data_inicial <- ymd(paste(year(Sys.Date()) - 2, "01-01", sep = "-"))
+# Defina a data inicial como o primeiro dia do ano há 1 ano atrás
+data_inicial <- ymd(paste(year(Sys.Date()) - 1, "01-01", sep = "-"))
 
 # Obtenha a data atual
 data_atual <- Sys.Date()
 
-# Loop para baixar as datas desde o primeiro dia do ano há dois anos atrás até a data atual
+# Loop para baixar as datas desde o primeiro dia do ano há 1 ano atrás até a data atual
 data <- data_inicial
 while (data <= data_atual) {
   numero <- as.numeric(format(data, "%Y%m%d"))
