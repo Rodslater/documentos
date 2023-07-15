@@ -76,40 +76,32 @@ empenho <- rbindlist(lapply(empenho, function(file) fread(file, encoding = "Lati
 liquidacao <- rbindlist(lapply(liquidacao, function(file) fread(file, encoding = "Latin-1", colClasses = "character")))
 pagamento <- rbindlist(lapply(pagamento, function(file) fread(file, encoding = "Latin-1", colClasses = "character")))
 
-
+                              
 empenho <- empenho |> 
-  select(6,3,62,4,7,11:14,17:19, 31,33,35,37,42,47,49,53:55) 
-
+  select(6,3,62,4,7,11:14,17:19, 31,33,35,37,42,47,49,53,55,54) 
 
 liquidacao <- liquidacao |> 
-  select(5,2,3,8:11, 14:16,18,20,24,26)
+  select(5,2,3,8,10,11, 14:16,18,20,24,26)
 
 pagamento <- pagamento |> 
-  select(5,2,33,3,6,10:13,16:19,21,23,27,29)
+  select(5,2,33,3,6,10,12,13,16:19,21,23,27,29)
 
-
-colnames(empenho) <- c("tipo_documento", "cod_empenho", "valor", "data", "tipo_empenho", "cod_orgao", 'orgao', "cod_ug", "ug", "cod_favorecido", "favorecido", "obs", "funcao", "subfuncao", "programa", "acao", "plano_orcamentario", "cat_despesa", "grupo_despesa", "elemento_despesa", "processo", "licitacao")
-colnames(liquidacao) <- c("tipo_documento", "cod_liquidacao", "data", "cod_orgao", "orgao", "cod_ug", "ug", "cod_favorecido", "favorecido", "obs", "cat_despesa", "grupo_despesa", "elemento_despesa", "plano_orcamentario")
-colnames(pagamento) <- c("tipo_documento", "cod_pagamento", "valor", "data", "tipo_ob", "cod_orgao", "orgao", "cod_ug", "ug", "cod_favorecido", "favorecido", "obs", "processo","cat_despesa", "grupo_despesa", "elemento_despesa", "plano_orcamentario")
-
+                              
 empenho <- empenho |> 
-  filter(cod_orgao == '26423') |> 
-  mutate(valor = as.numeric(str_replace(valor, ",", "."))) |> 
-  mutate(data=dmy(data)) |> 
-  arrange(desc(data), desc(cod_empenho))
+  filter(`Código Órgão` == '26423') |> 
+  rename(Valor = `Valor do Empenho Convertido pra R$`) |> 
+  mutate(Valor = as.numeric(str_replace(Valor, ",", "."))) |> 
+  arrange(desc(`Data Emissão`), desc(`Código Empenho Resumido`))
   
-
 liquidacao <- liquidacao |>
-  filter(cod_orgao == '26423') |> 
-  mutate(data=dmy(data)) |> 
-  arrange(desc(data), desc(cod_liquidacao))
+  filter(`Código Órgão` == '26423') |> 
+  arrange(desc(`Data Emissão`), desc(`Código Liquidação Resumido`))
 
-  
-pagamento <- pagamento |> 
-  filter(cod_orgao == '26423') |> 
-  mutate(valor = as.numeric(str_replace(valor, ",", "."))) |> 
-  mutate(data=dmy(data)) |> 
-  arrange(desc(data), desc(cod_pagamento))
+  pagamento <- pagamento |> 
+  filter(`Código Órgão` == '26423') |> 
+  rename(Valor = `Valor do Pagamento Convertido pra R$`) |> 
+  mutate(Valor = as.numeric(str_replace(Valor, ",", "."))) |>  
+  arrange(desc(`Data Emissão`), desc(`Código Pagamento Resumido`))
 
 
 arquivos_csv <- dir(pattern = ".csv")
