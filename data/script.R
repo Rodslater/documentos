@@ -11,17 +11,20 @@ memory.limit(24576)
 num_cores <- parallel::detectCores()
 registerDoParallel(cores = num_cores)
 
+
 # Crie um vetor vazio para armazenar as datas
 datas <- c()
 
-# Defina a data inicial como o primeiro dia do ano há 1 ano atrás
-data_inicial <- ymd(paste(year(Sys.Date()) - 1, "01-01", sep = "-"))
+# Defina a data inicial como 01/01/2022
+data_inicial <- as.Date("2022-01-01")
 
-# Obtenha a data atual
-data_atual <- Sys.Date()
+# Defina a data final como 31/12/2022
+data_final <- as.Date("2022-12-31")
 
-# Gere as datas desde o primeiro dia do ano há 1 ano atrás até a data atual
-datas <- seq(data_inicial, data_atual, by = "day")
+# Gere as datas de 01/01/2022 a 31/12/2022
+datas <- seq(data_inicial, data_final, by = "day")
+
+# Converta as datas para o formato numérico YYYYMMDD
 datas <- as.numeric(format(datas, "%Y%m%d"))
 
 
