@@ -87,14 +87,8 @@ read_and_combine <- function(file) {
 
 # Listar os arquivos CSV na pasta
 empenho <- list.files(pattern = ".*Despesas_Empenho\\.csv$", full.names = TRUE) 
-liquidacao <- list.files(pattern = ".*Despesas_Liquidacao\\.csv$", full.names = TRUE) 
-pagamento <- list.files(pattern = ".*Despesas_Pagamento\\.csv$", full.names = TRUE) 
-
 # Lista para armazenar os dados combinados
 combined_empenho <- list()
-combined_liquidacao <- list()
-combined_pagamento <- list()
-
 # Loop para ler e combinar os dados de cada arquivo de empenho
 for (file in empenho) {
   data <- read_and_combine(file)
@@ -102,12 +96,83 @@ for (file in empenho) {
   rm(data)  # Liberar memória ocupada pelo arquivo
 }
 
+# Combina os dados de todos os arquivos
+empenho <- rbindlist(combined_empenho)
+
+objects_to_remove <- ls()  # Obtém uma lista de todos os objetos no ambiente
+objects_to_remove <- objects_to_remove[!sapply(objects_to_remove, function(obj) is.data.frame(get(obj)))]  # Filtra apenas os objetos que não são data frames
+rm(list = objects_to_remove)  # Remove os objetos selecionados
+Sys.sleep(5)
+gc()
+
+empenho <- empenho |> 
+  select(6,3,62,4,7,11:14,17:19,31,33,35,37,42,47,49,53,55,54) 
+
+empenho <- empenho |> 
+  filter(`Código Órgão` == '26423') |> 
+  rename(Valor = `Valor do Empenho Convertido pra R$`) |> 
+  mutate(Valor = as.numeric(str_replace(Valor, ",", "."))) |> 
+  arrange(desc(`Data Emissão`), desc(`Código Empenho Resumido`))
+
+saveRDS(empenho, 'data/empenho.rds')
+rm(list=ls())
+Sys.sleep(5)
+gc()
+
+
+
+
+liquidacao <- list.files(pattern = ".*Despesas_Liquidacao\\.csv$", full.names = TRUE) 
+
+# Função para ler e combinar os dados de um arquivo
+read_and_combine <- function(file) {
+  data <- fread(file, encoding = "Latin-1", colClasses = "character")
+  return(data)
+}
+
+# Lista para armazenar os dados combinados
+combined_liquidacao <- list()
 # Loop para ler e combinar os dados de cada arquivo de liquidação
 for (file in liquidacao) {
   data <- read_and_combine(file)
   combined_liquidacao <- c(combined_liquidacao, list(data))
   rm(data)  # Liberar memória ocupada pelo arquivo
 }
+liquidacao <- rbindlist(combined_liquidacao)
+
+objects_to_remove <- ls()  # Obtém uma lista de todos os objetos no ambiente
+objects_to_remove <- objects_to_remove[!sapply(objects_to_remove, function(obj) is.data.frame(get(obj)))]  # Filtra apenas os objetos que não são data frames
+rm(list = objects_to_remove)  # Remove os objetos selecionados
+Sys.sleep(5)
+gc() 
+
+liquidacao <- liquidacao |> 
+  select(5,2,3,8,10,11,14:16,18,20,24,26)
+
+liquidacao <- liquidacao |>
+  filter(`Código Órgão` == '26423') |> 
+  arrange(desc(`Data Emissão`), desc(`Código Liquidação Resumido`))
+
+
+saveRDS(liquidacao, 'data/liquidacao.rds')
+rm(list=ls())
+Sys.sleep(5)
+gc()
+
+
+
+
+
+pagamento <- list.files(pattern = ".*Despesas_Pagamento\\.csv$", full.names = TRUE) 
+
+# Função para ler e combinar os dados de um arquivo
+read_and_combine <- function(file) {
+  data <- fread(file, encoding = "Latin-1", colClasses = "character")
+  return(data)
+}
+
+
+combined_pagamento <- list()
 
 # Loop para ler e combinar os dados de cada arquivo de pagamento
 for (file in pagamento) {
@@ -116,42 +181,28 @@ for (file in pagamento) {
   rm(data)  # Liberar memória ocupada pelo arquivo
 }
 
-# Combina os dados de todos os arquivos
-empenho <- rbindlist(combined_empenho)
-liquidacao <- rbindlist(combined_liquidacao)
 pagamento <- rbindlist(combined_pagamento)
 
-                              
-empenho <- empenho |> 
-  select(6,3,62,4,7,11:14,17:19,31,33,35,37,42,47,49,53,55,54) 
-
-liquidacao <- liquidacao |> 
-  select(5,2,3,8,10,11,14:16,18,20,24,26)
+objects_to_remove <- ls()  # Obtém uma lista de todos os objetos no ambiente
+objects_to_remove <- objects_to_remove[!sapply(objects_to_remove, function(obj) is.data.frame(get(obj)))]  # Filtra apenas os objetos que não são data frames
+rm(list = objects_to_remove)  # Remove os objetos selecionados
+Sys.sleep(5)
+gc()
 
 pagamento <- pagamento |> 
   select(5,2,33,3,6,10,12,13,16:19,21,23,27,29)
 
-                              
-empenho <- empenho |> 
-  filter(`Código Órgão` == '26423') |> 
-  rename(Valor = `Valor do Empenho Convertido pra R$`) |> 
-  mutate(Valor = as.numeric(str_replace(Valor, ",", "."))) |> 
-  arrange(desc(`Data Emissão`), desc(`Código Empenho Resumido`))
-  
-liquidacao <- liquidacao |>
-  filter(`Código Órgão` == '26423') |> 
-  arrange(desc(`Data Emissão`), desc(`Código Liquidação Resumido`))
-
-  pagamento <- pagamento |> 
+pagamento <- pagamento |> 
   filter(`Código Órgão` == '26423') |> 
   rename(Valor = `Valor do Pagamento Convertido pra R$`) |> 
   mutate(Valor = as.numeric(str_replace(Valor, ",", "."))) |>  
   arrange(desc(`Data Emissão`), desc(`Código Pagamento Resumido`))
 
+saveRDS(pagamento, 'data/pagamento.rds')
+rm(list=ls())
+Sys.sleep(5)
+gc()
+
 
 arquivos_csv <- dir(pattern = ".csv")
 file.remove(arquivos_csv)
-
-saveRDS(empenho, 'data/empenho.rds')
-saveRDS(liquidacao, 'data/liquidacao.rds')
-saveRDS(pagamento, 'data/pagamento.rds')
