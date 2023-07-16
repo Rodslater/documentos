@@ -7,21 +7,19 @@ library(lubridate)
 library(httr)
 library(doParallel)
 
-memory.limit(24576)
 num_cores <- parallel::detectCores()
 registerDoParallel(cores = num_cores)
-
 
 # Crie um vetor vazio para armazenar as datas
 datas <- c()
 
-# Defina a data inicial como 01/01/2022
-data_inicial <- as.Date("2022-01-01")
+# Defina a data inicial como o primeiro dia do ano corrente
+data_inicial <- as.Date(paste0(format(Sys.Date(), "%Y"), "-01-01"))
 
-# Defina a data final como 31/12/2022
-data_final <- as.Date("2022-12-31")
+# Defina a data final como o dia corrente
+data_final <- Sys.Date()
 
-# Gere as datas de 01/01/2022 a 31/12/2022
+# Gere as datas desde o primeiro dia do ano corrente até a data final
 datas <- seq(data_inicial, data_final, by = "day")
 
 # Converta as datas para o formato numérico YYYYMMDD
