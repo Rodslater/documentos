@@ -5,52 +5,47 @@ library(data.table)
 library(downloader)
 library(lubridate)
 library(httr)
+library(parallel)
 
-memory.limit(24576)
 
 # Crie um vetor vazio para armazenar as datas
 datas <- c()
 
-# Defina a data inicial como 01/01/2022
-data_inicial <- dmy("10/07/2023")
+# Defina a data inicial como o primeiro dia do ano há 1 ano atrás
+data_inicial <- ymd(paste(year(Sys.Date()) - 1, "01-01", sep = "-"))
 
 # Obtenha a data atual
 data_atual <- Sys.Date()
 
-# Loop para baixar as datas desde 01/01/2023 até a data atual
-data <- data_inicial
-while (data <= data_atual) {
-  numero <- as.numeric(format(data, "%Y%m%d"))
-  datas <- c(datas, numero)
-  data <- data + days(1)  # Avança para o próximo dia
-}
+# Gere as datas desde o primeiro dia do ano há 1 ano atrás até a data atual
+datas <- seq(data_inicial, data_atual, by = "day")
+datas <- as.numeric(format(datas, "%Y%m%d"))
 
 
-
-#Loop de baixar as séries
-for (i in seq_along(datas)) {
-  url <- paste0('https://portaldatransparencia.gov.br/download-de-dados/despesas/', datas[i], '.zip')
-  arquivo <- sprintf("dataset_%s.zip", datas[i])
+# Função para baixar e processar um arquivo
+download_and_process <- function(data) {
+  url <- paste0('https://portaldatransparencia.gov.br/download-de-dados/despesas/', data, '.zip')
+  arquivo <- sprintf("dataset_%s.zip", data)
   
   # Verifica se o arquivo existe antes de fazer o download
   response <- tryCatch(
     {
-      GET(url)
+      HEAD(url)
     },
     error = function(e) {
       return(NULL)
     }
   )
   
-  # Se a resposta é NULL, o arquivo não existe, então passa para a próxima iteração
+  # Se a resposta é NULL, o arquivo não existe, então retorna
   if (is.null(response)) {
     message(paste("Arquivo não encontrado:", arquivo))
-    return()
+    return(NULL)
   }
   
   tryCatch(
     {
-      download(url, dest = arquivo, mode = "wb")
+      download.file(url, destfile = arquivo, mode = "wb")
       unzip(arquivo)
       file.remove(arquivo)
       arquivos_csv <- list.files(pattern = "\\.csv$", full.names = TRUE)
@@ -60,10 +55,23 @@ for (i in seq_along(datas)) {
     },
     error = function(e) {
       message(paste("Erro ao baixar o arquivo:", arquivo))
-      return()
+      return(NULL)
     }
   )
 }
+
+# Número de processos paralelos a serem executados
+num_cores <- parallel::detectCores()
+
+# Executa o download e processamento em paralelo
+results <- mclapply(datas, download_and_process, mc.cores = num_cores)
+
+# Verifica se algum arquivo retornou NULL (não encontrado ou erro)
+null_results <- which(sapply(results, is.null))
+if (length(null_results) > 0) {
+  message("Alguns arquivos não foram encontrados ou ocorreram erros.")
+}
+
 
 
 # Listar os arquivos CSV na pasta
