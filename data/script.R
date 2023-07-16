@@ -7,9 +7,9 @@ library(lubridate)
 library(httr)
 library(doParallel)
 
+memory.limit(24576)
 num_cores <- parallel::detectCores()
 registerDoParallel(cores = num_cores)
-
 
 # Crie um vetor vazio para armazenar as datas
 datas <- c()
