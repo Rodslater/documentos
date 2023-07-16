@@ -5,7 +5,10 @@ library(data.table)
 library(downloader)
 library(lubridate)
 library(httr)
-library(parallel)
+library(doParallel)
+
+num_cores <- parallel::detectCores()
+registerDoParallel(cores = num_cores)
 
 
 # Crie um vetor vazio para armazenar as datas
@@ -64,7 +67,9 @@ download_and_process <- function(data) {
 num_cores <- parallel::detectCores()
 
 # Executa o download e processamento em paralelo
-results <- mclapply(datas, download_and_process, mc.cores = num_cores)
+results <- foreach(data = datas, .packages = c("httr", "lubridate"), .combine = c) %dopar% {
+  download_and_process(data)
+}
 
 # Verifica se algum arquivo retornou NULL (não encontrado ou erro)
 null_results <- which(sapply(results, is.null))
