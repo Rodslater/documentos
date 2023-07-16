@@ -79,15 +79,47 @@ if (length(null_results) > 0) {
 
 
 
+# Função para ler e combinar os dados de um arquivo
+read_and_combine <- function(file) {
+  data <- fread(file, encoding = "Latin-1", colClasses = "character")
+  return(data)
+}
+
 # Listar os arquivos CSV na pasta
 empenho <- list.files(pattern = ".*Despesas_Empenho\\.csv$", full.names = TRUE) 
 liquidacao <- list.files(pattern = ".*Despesas_Liquidacao\\.csv$", full.names = TRUE) 
 pagamento <- list.files(pattern = ".*Despesas_Pagamento\\.csv$", full.names = TRUE) 
 
+# Lista para armazenar os dados combinados
+combined_empenho <- list()
+combined_liquidacao <- list()
+combined_pagamento <- list()
 
-empenho <- rbindlist(lapply(empenho, function(file) fread(file, encoding = "Latin-1", colClasses = "character")))
-liquidacao <- rbindlist(lapply(liquidacao, function(file) fread(file, encoding = "Latin-1", colClasses = "character")))
-pagamento <- rbindlist(lapply(pagamento, function(file) fread(file, encoding = "Latin-1", colClasses = "character")))
+# Loop para ler e combinar os dados de cada arquivo de empenho
+for (file in empenho) {
+  data <- read_and_combine(file)
+  combined_empenho <- c(combined_empenho, list(data))
+  rm(data)  # Liberar memória ocupada pelo arquivo
+}
+
+# Loop para ler e combinar os dados de cada arquivo de liquidação
+for (file in liquidacao) {
+  data <- read_and_combine(file)
+  combined_liquidacao <- c(combined_liquidacao, list(data))
+  rm(data)  # Liberar memória ocupada pelo arquivo
+}
+
+# Loop para ler e combinar os dados de cada arquivo de pagamento
+for (file in pagamento) {
+  data <- read_and_combine(file)
+  combined_pagamento <- c(combined_pagamento, list(data))
+  rm(data)  # Liberar memória ocupada pelo arquivo
+}
+
+# Combina os dados de todos os arquivos
+empenho <- rbindlist(combined_empenho)
+liquidacao <- rbindlist(combined_liquidacao)
+pagamento <- rbindlist(combined_pagamento)
 
                               
 empenho <- empenho |> 
