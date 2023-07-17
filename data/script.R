@@ -108,7 +108,7 @@ liquidacao <- list.files(pattern = ".*Despesas_Liquidacao\\.csv$", full.names = 
 
 colunas_liquidacao <- c('Tipo Documento','Código Liquidação Resumido','Data Emissão','Código Órgão','Código Unidade Gestora','Unidade Gestora','Código Favorecido','Favorecido','Observação','Categoria de Despesa','Grupo de Despesa','Elemento de Despesa','Plano Orçamentário')
 
-liquidacao <- rbindlist(lapply(arquivos_csv, function(file) {
+liquidacao <- rbindlist(lapply(liquidacao, function(file) {
   fread(file, select = colunas_liquidacao, encoding = "Latin-1", colClasses = "character")
 }))
 
@@ -129,7 +129,7 @@ pagamento <- list.files(pattern = ".*Despesas_Pagamento\\.csv$", full.names = TR
 
 colunas_pagamento <- c('Tipo Documento','Código Pagamento Resumido','Valor do Pagamento Convertido pra R$','Data Emissão','Tipo OB','Código Órgão','Código Unidade Gestora','Unidade Gestora','Código Favorecido','Favorecido','Observação','Processo','Categoria de Despesa','Grupo de Despesa','Elemento de Despesa','Plano Orçamentário')
 
-pagamento <- rbindlist(lapply(arquivos_csv, function(file) {
+pagamento <- rbindlist(lapply(pagamento, function(file) {
   fread(file, select = colunas_pagamento, encoding = "Latin-1", colClasses = "character")
 }))
 
@@ -144,7 +144,6 @@ saveRDS(pagamento, 'data/pagamento.rds')
 rm(list = ls())
 Sys.sleep(5)
 gc()
-
 
 
 
