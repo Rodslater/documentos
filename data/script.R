@@ -80,34 +80,14 @@ if (length(null_results) > 0) {
 
 
 
-# Função para ler e combinar os dados de um arquivo
-read_and_combine <- function(file) {
-  data <- fread(file, encoding = "Latin-1", colClasses = "character")
-  return(data)
-}
 
-# Listar os arquivos CSV na pasta
 empenho <- list.files(pattern = ".*Despesas_Empenho\\.csv$", full.names = TRUE) 
-# Lista para armazenar os dados combinados
-combined_empenho <- list()
-# Loop para ler e combinar os dados de cada arquivo de empenho
-for (file in empenho) {
-  data <- read_and_combine(file)
-  combined_empenho <- c(combined_empenho, list(data))
-  rm(data)  # Liberar memória ocupada pelo arquivo
-}
 
-# Combina os dados de todos os arquivos
-empenho <- rbindlist(combined_empenho)
+colunas_empenho <- c('Tipo Documento','Código Empenho Resumido','Valor','Data Emissão','Tipo Empenho','Código Órgão','Órgão','Código Unidade Gestora','Unidade Gestora','Código Favorecido','Favorecido','Observação','Função','SubFunção','Programa','Ação','Plano Orçamentário','Categoria de Despesa','Grupo de Despesa','Elemento de Despesa','Modalidade de Licitação','Processo')
 
-objects_to_remove <- ls()  # Obtém uma lista de todos os objetos no ambiente
-objects_to_remove <- objects_to_remove[!sapply(objects_to_remove, function(obj) is.data.frame(get(obj)))]  # Filtra apenas os objetos que não são data frames
-rm(list = objects_to_remove)  # Remove os objetos selecionados
-Sys.sleep(5)
-gc()
-
-empenho <- empenho |> 
-  select(6,3,62,4,7,11:14,17:19,31,33,35,37,42,47,49,53,55,54) 
+empenho <- rbindlist(lapply(empenho, function(file) {
+  fread(file, select = colunas_empenho, encoding = "Latin-1", colClasses = "character")
+}))
 
 empenho <- empenho |> 
   filter(`Código Órgão` == '26423') |> 
@@ -116,7 +96,8 @@ empenho <- empenho |>
   arrange(desc(`Data Emissão`), desc(`Código Empenho Resumido`))
 
 saveRDS(empenho, 'data/empenho.rds')
-rm(list=ls())
+
+rm(list = ls())
 Sys.sleep(5)
 gc()
 
@@ -125,73 +106,32 @@ gc()
 
 liquidacao <- list.files(pattern = ".*Despesas_Liquidacao\\.csv$", full.names = TRUE) 
 
-# Função para ler e combinar os dados de um arquivo
-read_and_combine <- function(file) {
-  data <- fread(file, encoding = "Latin-1", colClasses = "character")
-  return(data)
-}
+colunas_liquidacao <- c('Tipo Documento','Código Liquidação Resumido','Data Emissão','Código Órgão','Código Unidade Gestora','Unidade Gestora','Código Favorecido','Favorecido','Observação','Categoria de Despesa','Grupo de Despesa','Elemento de Despesa','Plano Orçamentário')
 
-# Lista para armazenar os dados combinados
-combined_liquidacao <- list()
-# Loop para ler e combinar os dados de cada arquivo de liquidação
-for (file in liquidacao) {
-  data <- read_and_combine(file)
-  combined_liquidacao <- c(combined_liquidacao, list(data))
-  rm(data)  # Liberar memória ocupada pelo arquivo
-}
-liquidacao <- rbindlist(combined_liquidacao)
-
-objects_to_remove <- ls()  # Obtém uma lista de todos os objetos no ambiente
-objects_to_remove <- objects_to_remove[!sapply(objects_to_remove, function(obj) is.data.frame(get(obj)))]  # Filtra apenas os objetos que não são data frames
-rm(list = objects_to_remove)  # Remove os objetos selecionados
-Sys.sleep(5)
-gc() 
-
-liquidacao <- liquidacao |> 
-  select(5,2,3,8,10,11,14:16,18,20,24,26)
+liquidacao <- rbindlist(lapply(arquivos_csv, function(file) {
+  fread(file, select = colunas_liquidacao, encoding = "Latin-1", colClasses = "character")
+}))
 
 liquidacao <- liquidacao |>
   filter(`Código Órgão` == '26423') |> 
   arrange(desc(`Data Emissão`), desc(`Código Liquidação Resumido`))
 
-
 saveRDS(liquidacao, 'data/liquidacao.rds')
-rm(list=ls())
+
+rm(list = ls())
 Sys.sleep(5)
 gc()
-
 
 
 
 
 pagamento <- list.files(pattern = ".*Despesas_Pagamento\\.csv$", full.names = TRUE) 
 
-# Função para ler e combinar os dados de um arquivo
-read_and_combine <- function(file) {
-  data <- fread(file, encoding = "Latin-1", colClasses = "character")
-  return(data)
-}
+colunas_pagamento <- c('Tipo Documento','Código Pagamento Resumido','Valor','Data Emissão','Tipo OB','Código Órgão','Código Unidade Gestora','Unidade Gestora','Código Favorecido','Favorecido','Observação','Processo','Categoria de Despesa','Grupo de Despesa','Elemento de Despesa','Plano Orçamentário')
 
-
-combined_pagamento <- list()
-
-# Loop para ler e combinar os dados de cada arquivo de pagamento
-for (file in pagamento) {
-  data <- read_and_combine(file)
-  combined_pagamento <- c(combined_pagamento, list(data))
-  rm(data)  # Liberar memória ocupada pelo arquivo
-}
-
-pagamento <- rbindlist(combined_pagamento)
-
-objects_to_remove <- ls()  # Obtém uma lista de todos os objetos no ambiente
-objects_to_remove <- objects_to_remove[!sapply(objects_to_remove, function(obj) is.data.frame(get(obj)))]  # Filtra apenas os objetos que não são data frames
-rm(list = objects_to_remove)  # Remove os objetos selecionados
-Sys.sleep(5)
-gc()
-
-pagamento <- pagamento |> 
-  select(5,2,33,3,6,10,12,13,16:19,21,23,27,29)
+pagamento <- rbindlist(lapply(arquivos_csv, function(file) {
+  fread(file, select = colunas_pagamento, encoding = "Latin-1", colClasses = "character")
+}))
 
 pagamento <- pagamento |> 
   filter(`Código Órgão` == '26423') |> 
@@ -200,9 +140,12 @@ pagamento <- pagamento |>
   arrange(desc(`Data Emissão`), desc(`Código Pagamento Resumido`))
 
 saveRDS(pagamento, 'data/pagamento.rds')
-rm(list=ls())
+
+rm(list = ls())
 Sys.sleep(5)
 gc()
+
+
 
 
 arquivos_csv <- dir(pattern = ".csv")
