@@ -83,7 +83,7 @@ if (length(null_results) > 0) {
 
 empenho <- list.files(pattern = ".*Despesas_Empenho\\.csv$", full.names = TRUE) 
 
-colunas_empenho <- c('Tipo Documento','Código Empenho Resumido','Valor','Data Emissão','Tipo Empenho','Código Órgão','Órgão','Código Unidade Gestora','Unidade Gestora','Código Favorecido','Favorecido','Observação','Função','SubFunção','Programa','Ação','Plano Orçamentário','Categoria de Despesa','Grupo de Despesa','Elemento de Despesa','Modalidade de Licitação','Processo')
+colunas_empenho <- c('Tipo Documento','Código Empenho Resumido','Valor do Empenho Convertido pra R$','Data Emissão','Tipo Empenho','Código Órgão','Órgão','Código Unidade Gestora','Unidade Gestora','Código Favorecido','Favorecido','Observação','Função','SubFunção','Programa','Ação','Plano Orçamentário','Categoria de Despesa','Grupo de Despesa','Elemento de Despesa','Modalidade de Licitação','Processo')
 
 empenho <- rbindlist(lapply(empenho, function(file) {
   fread(file, select = colunas_empenho, encoding = "Latin-1", colClasses = "character")
@@ -127,7 +127,7 @@ gc()
 
 pagamento <- list.files(pattern = ".*Despesas_Pagamento\\.csv$", full.names = TRUE) 
 
-colunas_pagamento <- c('Tipo Documento','Código Pagamento Resumido','Valor','Data Emissão','Tipo OB','Código Órgão','Código Unidade Gestora','Unidade Gestora','Código Favorecido','Favorecido','Observação','Processo','Categoria de Despesa','Grupo de Despesa','Elemento de Despesa','Plano Orçamentário')
+colunas_pagamento <- c('Tipo Documento','Código Pagamento Resumido','Valor do Pagamento Convertido pra R$','Data Emissão','Tipo OB','Código Órgão','Código Unidade Gestora','Unidade Gestora','Código Favorecido','Favorecido','Observação','Processo','Categoria de Despesa','Grupo de Despesa','Elemento de Despesa','Plano Orçamentário')
 
 pagamento <- rbindlist(lapply(arquivos_csv, function(file) {
   fread(file, select = colunas_pagamento, encoding = "Latin-1", colClasses = "character")
